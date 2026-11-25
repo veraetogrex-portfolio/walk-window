@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>T40 Walk Window — 30 dry minutes in a rainy forecast</title>
+<link rel="stylesheet" href="_shared/nocturne.css">
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* the whole app screen from ../, in Nocturne type; no grid on the app screen */
+  #stage{background:#07080C}
+  #stage .vw{position:absolute;left:0;top:0;--font:var(--f-text)}
+  body.autoplay #stage :focus-visible{outline:none}
+  body.autoplay #li-cursor{transition:none}   /* visible from frame one, no fade at the loop seam */
+  #li-cursor svg{transform:scale(1.5);transform-origin:4px 3px}   /* the hand stays readable in a phone-sized reel */
+  #li-cursor.down svg{transform:scale(1.3)}
+</style>
+</head>
+<body>
+<div id="stage" data-title="T40 Walk Window" data-url="veraetogrex-portfolio.github.io/walk-window">
+  <section class="vw" aria-label="VECTOR Weather" data-assets="../assets/"></section>
+</div>
+<script src="_shared/stage.js"></script>
+<script src="../script.js"></script>
+<script>
+const app = document.querySelector('.vw').weatherApp;
+const rightEnd = sel => { const r = Stage.rect(document.querySelector(sel)); return [r.x + r.w - 16, r.cy + 4]; };   // the hand stays off the label
+const REST = [985, 195];   // at rest on blank space of the Now card, off the chart
+// one act: Today → "Find 30 dry minutes" walks the steps → 2:40–3:10 found → "Remind me at 2:30 PM", the walk lands in Plans today
+Stage.init({
+  reset: () => app.reset(),
+  cursorStart: REST,
+  async demo(s) {
+    const t0 = performance.now();
+    await s.until(t0, 920);                           // the whole Today screen at rest first
+    await s.move(rightEnd('[data-find]'), 520);       // onto "Find 30 dry minutes" while the camera pushes in on the rain card
+    await s.until(t0, 1500);
+    await s.click(null, { hold: 110 });               // the steps are checked left to right, 100 ms each; 2:40–3:10 lights up at about 3.26 s
+    await s.until(t0, 4940);                          // the camera has held the found window close up since 3.85 s
+    await s.move(rightEnd('[data-remind]'), 500);     // onto "Remind me at 2:30 PM" while the camera moves to the button
+    await s.until(t0, 5630);
+    await s.click(null, { hold: 110 });               // "Reminder set · 2:30 PM"; 0.7 s later the walk lands in Plans today, the camera pans there and holds it
+    await s.until(t0, 9750);
+  },
+});
+</script>
+</body>
+</html>
